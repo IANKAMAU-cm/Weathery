@@ -1,13 +1,18 @@
 from flask import Flask, render_template, request
 import requests
 import geoip2
-
+from dotenv import load_dotenv
+import os
 
 app = Flask(__name__)
 
-# Replace with your OpenWeatherMap API key
-API_KEY = '562b40d8ff660d9da660fdffcce5812f'
-BASE_URL = 'http://api.openweathermap.org/data/2.5/weather'
+# Load environment variables from .env file
+load_dotenv()
+
+# Access your API key as an environment variable
+API_KEY = os.getenv('OPENWEATHER_API_KEY')
+
+
 
 @app.route('/')
 def index():
@@ -23,8 +28,8 @@ def index():
 @app.route('/weather', methods=['POST'])
 def weather():
     city = request.form.get('city')
-    api_key = '562b40d8ff660d9da660fdffcce5812f'
-    url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric'
+    
+    url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={API_KEY}&units=metric'
     
     response = requests.get(url)
     if response.status_code == 200:
@@ -63,8 +68,8 @@ def weather():
 
 @app.route('/forecast/<city>')
 def forecast(city):
-    api_key = '562b40d8ff660d9da660fdffcce5812f'
-    url = f'http://api.openweathermap.org/data/2.5/forecast?q={city}&appid={api_key}&units=metric'
+    
+    url = f'http://api.openweathermap.org/data/2.5/forecast?q={city}&appid={API_KEY}&units=metric'
     
     response = requests.get(url)
     if response.status_code == 200:
