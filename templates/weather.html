@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Report</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        a {
+            color: grey;
+            text-decoration: underline;
+        }
+
+        .weather-container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .temp {
+            font-size: 4rem;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .condition {
+            font-size: 1.5rem;
+            text-transform: capitalize;
+        }
+
+        .details {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body style="background-image: url('{{ background_url }}');">
+    <div class="weather-container">
+        <h1>Weather in {{ city }}</h1>
+        <div class="temp">{{ temperature }}°C</div>
+        <div class="condition">{{ condition }}</div>
+        <div class="details">
+            <!--<p>Feels Like: {{ feels_like }}°C</p>-->
+            <p>Humidity: {{ humidity }}%</p>
+            <p>Wind Speed: {{ wind_speed }} km/h</p>
+            <a href="/">Search again</a>
+            <a href="{{ url_for('forecast', city=city) }}" class="btn btn-primary">View 5-Day Forecast</a>
+        </div>
+    </div>
+</body>
+</html>

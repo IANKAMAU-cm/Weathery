@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(to bottom, #87CEEB, #f0f8ff);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    
+        .clouds {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/cloudy.png');
+            animation: moveClouds 30s linear infinite;
+            z-index: 1; /* Ensure the clouds are below the form */
+        }
+    
+        @keyframes moveClouds {
+            from {
+                transform: translateX(0);
+            }
+            to {
+                transform: translateX(-50%);
+            }
+        }
+    
+        .form-container {
+            position: relative;
+            z-index: 10; /* Bring the form above the clouds */
+            text-align: center;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    
+        .form-control {
+            font-size: 1.2rem;
+            padding: 10px;
+        }
+    
+        .btn {
+            font-size: 1.2rem;
+        }
+    </style>    
+</head>
+<body>
+    <div class="clouds"></div>
+    <div class="form-container">
+        <h1>Weather App</h1>
+        <form action="/weather" method="POST">
+            <input type="text" name="city" placeholder="e.g., {{ city }}" class="form-control mb-3" required>
+            <button type="submit" class="btn btn-primary">Get Weather</button>
+        </form>
+        {% if error %}
+            <p style="color: red;">{{ error }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>
