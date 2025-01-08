@@ -1,10 +1,15 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import requests
 import geoip2
 from dotenv import load_dotenv
 import os
+import json
 
 app = Flask(__name__)
+
+# Load the cities data once during app startup
+with open("static/data/cities.json", "r") as f:
+    cities_data = json.load(f)
 
 # Load environment variables from .env file
 load_dotenv()
@@ -24,6 +29,18 @@ def index():
         location_data = response.json()
         city = location_data.get('city', 'Nairobi')  # Default to Nairobi
     return render_template('index.html', city=city)
+
+@app.route("/autocomplete", methods=["GET"])
+def autocomplete():
+    query = request.args.get("query", "").lower()
+    if not query:
+        return jsonify([])
+
+    # Filter city names that match the query
+    matching_cities = [
+        city["name"] for city in cities_data if query in city["name"].lower()
+    ]
+    return jsonify(matching_cities[:5])  # Limit to top 5 matches
 
 @app.route('/weather', methods=['POST'])
 def weather():
