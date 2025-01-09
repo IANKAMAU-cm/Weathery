@@ -61,7 +61,7 @@
     <div class="form-container">
         <h1>Weather App</h1>
         <form action="/weather" method="POST">
-            <input type="text" id="city-input" name="city" placeholder="e.g., {{ city }}" class="form-control mb-3" required>
+            <input type="text" id="city-input" name="city" placeholder="e.g., {{ city }}" aria-label="Search for a city" class="form-control mb-3" required>
             <button type="submit" class="btn btn-primary">Get Weather</button>
         </form>
         {% if error %}
@@ -88,7 +88,68 @@
                         }
                     });
                 },
-                minLength: 4, // Minimum characters before suggestions appear
+                minLength: 3, // Minimum characters before suggestions appear
+                focus: function (event, ui) {
+                    // Prevent value from being inserted on focus
+                    event.preventDefault();
+                    $("#city-input").val(ui.item.label); // Show the focused suggestion in the input
+                },
+                select: function (event, ui) {
+                    // Set the value when a suggestion is selected
+                    $("#city-input").val(ui.item.label);
+                    return false; // Prevent the default behavior
+                },
+                open: function () {
+                    // Add role and accessibility attributes when the menu opens
+                    $(".ui-autocomplete").attr({
+                        role: "listbox",
+                        "aria-label": "City suggestions"
+                    });
+                },
+                close: function () {
+                    // Remove attributes when the menu closes
+                    $(".ui-autocomplete").removeAttr("role aria-label");
+                }
+            }).data("ui-autocomplete")._renderItem = function (ul, item) {
+                // Customize how suggestions are displayed
+                return $("<li>")
+                    .attr("role", "option")
+                    .append($("<div>").text(item.label))
+                    .appendTo(ul);
+            };
+    
+            // Keyboard navigation for suggestions
+            $("#city-input").on("keydown", function (event) {
+                const autocompleteMenu = $(".ui-autocomplete");
+                const activeItem = $(".ui-state-focus");
+    
+                if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+                    // Prevent default browser scrolling
+                    event.preventDefault();
+    
+                    if (event.key === "ArrowDown") {
+                        // Move to the next suggestion
+                        if (activeItem.length && activeItem.next().length) {
+                            activeItem.removeClass("ui-state-focus");
+                            activeItem.next().addClass("ui-state-focus");
+                        } else {
+                            $(".ui-menu-item").first().addClass("ui-state-focus");
+                        }
+                    } else if (event.key === "ArrowUp") {
+                        // Move to the previous suggestion
+                        if (activeItem.length && activeItem.prev().length) {
+                            activeItem.removeClass("ui-state-focus");
+                            activeItem.prev().addClass("ui-state-focus");
+                        } else {
+                            $(".ui-menu-item").last().addClass("ui-state-focus");
+                        }
+                    }
+                } else if (event.key === "Enter") {
+                    // Select the focused suggestion
+                    if (activeItem.length) {
+                        activeItem.trigger("click");
+                    }
+                }
             });
         });
     </script>

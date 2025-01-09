@@ -4,8 +4,18 @@ import geoip2
 from dotenv import load_dotenv
 import os
 import json
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
+
+# Initialize Flask-Limiter
+limiter = Limiter(
+    get_remote_address,  # Use the client's IP address to track requests
+    app=app,
+    default_limits=["10 per hour"]  # Default rate limit: 100 requests per hour
+)
+
 
 # Load the cities data once during app startup
 with open("static/data/cities.json", "r") as f:
@@ -17,6 +27,18 @@ load_dotenv()
 # Access your API key as an environment variable
 API_KEY = os.getenv('OPENWEATHER_API_KEY')
 
+
+@limiter.request_filter
+def exempt_internal_ips():
+    # Allow unlimited requests from specific internal IPs
+    return request.remote_addr == "127.0.0.1"
+
+@limiter.error_handler
+def rate_limit_exceeded(e):
+    return jsonify({
+        "error": "Rate limit exceeded",
+        "message": "You have made too many requests. Please try again later."
+    }), 429
 
 
 @app.route('/')
@@ -31,6 +53,7 @@ def index():
     return render_template('index.html', city=city)
 
 @app.route("/autocomplete", methods=["GET"])
+@limiter.limit("10 per minute")
 def autocomplete():
     query = request.args.get("query", "").lower()
     if not query:
@@ -40,9 +63,10 @@ def autocomplete():
     matching_cities = [
         city["name"] for city in cities_data if query in city["name"].lower()
     ]
-    return jsonify(matching_cities[:5])  # Limit to top 5 matches
+    return jsonify(matching_cities[:10])  # Limit to top 10 matches
 
 @app.route('/weather', methods=['POST'])
+@limiter.limit("10 per minute")
 def weather():
     city = request.form.get('city')
     
